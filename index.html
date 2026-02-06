@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odliczanie do Naszego Spotkania</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --crimson:#9b1b30;
+  --rose:#c4466e;
+  --blush:#e8a0b4;
+  --gold:#d4a853;
+  --gold-light:#f0d48a;
+  --cream:#faf3eb;
+  --deep:#1a0a10;
+  --wine:#2d0f1e;
+  --petal:#f5dce5;
+}
+
+html{font-size:16px;scroll-behavior:smooth}
+
+body{
+  min-height:100vh;
+  background:var(--deep);
+  color:var(--cream);
+  font-family:'Cormorant Garamond',serif;
+  overflow-x:hidden;
+}
+
+/* ── BACKGROUND ── */
+.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-layer::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 15%, rgba(155,27,48,.3) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 80% 85%, rgba(196,70,110,.2) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(212,168,83,.06) 0%, transparent 80%);
+}
+.bg-layer::after{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity:.5;
+}
+
+/* ── FLOATING HEARTS ── */
+.hearts-container{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.floating-heart{
+  position:absolute;bottom:-60px;opacity:0;
+  animation:floatUp linear infinite;filter:blur(0.5px);
+}
+@keyframes floatUp{
+  0%{transform:translateY(0) rotate(0deg) scale(1);opacity:0}
+  10%{opacity:.5}50%{opacity:.35}90%{opacity:.08}
+  100%{transform:translateY(-110vh) rotate(720deg) scale(.3);opacity:0}
+}
+
+/* ── MAIN ── */
+.main{
+  position:relative;z-index:10;
+  display:flex;flex-direction:column;align-items:center;
+  min-height:100vh;padding:2.5rem 1.5rem 4rem;
+}
+
+/* ── HEADER ── */
+.header{text-align:center;margin-bottom:2.5rem;animation:fadeInDown 1.2s ease-out both}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-40px)}to{opacity:1;transform:translateY(0)}}
+.header h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.8rem,5vw,3.2rem);
+  font-weight:700;color:var(--cream);
+  line-height:1.15;letter-spacing:.02em;margin-bottom:.4rem;
+}
+.header h1 .heart-icon{display:inline-block;color:var(--rose);animation:pulse 1.5s ease-in-out infinite;margin:0 .2rem}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.header .subtitle{
+  font-family:'Dancing Script',cursive;
+  font-size:clamp(1.1rem,3vw,1.6rem);
+  color:var(--blush);opacity:.85;letter-spacing:.03em;
+}
+
+/* ── COUNTDOWN ── */
+.countdown-section{text-align:center;margin-bottom:3rem;animation:fadeIn 1.6s ease-out .4s both}
+@keyframes fadeIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.countdown-label{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(.8rem,1.8vw,1rem);
+  text-transform:uppercase;letter-spacing:.3em;
+  color:var(--gold);margin-bottom:1.2rem;
+}
+.countdown-grid{display:flex;gap:clamp(.6rem,2.5vw,1.8rem);justify-content:center;flex-wrap:wrap}
+.countdown-unit{
+  display:flex;flex-direction:column;align-items:center;
+  min-width:70px;
+  background:rgba(45,15,30,.5);backdrop-filter:blur(10px);
+  border:1px solid rgba(212,168,83,.15);
+  border-radius:16px;padding:1rem .8rem .8rem;
+}
+.countdown-value{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.5rem,6.5vw,4.5rem);
+  font-weight:700;line-height:1;color:var(--cream);
+  text-shadow:0 0 30px rgba(196,70,110,.25);
+  transition:transform .3s ease;
+}
+.countdown-value.tick{animation:tickBounce .4s ease}
+@keyframes tickBounce{0%{transform:scale(1)}30%{transform:scale(1.12)}100%{transform:scale(1)}}
+.countdown-label-text{
+  font-size:clamp(.6rem,1.3vw,.8rem);
+  text-transform:uppercase;letter-spacing:.15em;
+  color:var(--blush);margin-top:.5rem;opacity:.65;
+}
+.countdown-separator{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,5vw,3.5rem);color:var(--rose);
+  align-self:center;opacity:.4;animation:blink 1s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:.4}50%{opacity:.1}}
+
+/* ── MASONRY GALLERY ── */
+.gallery-section{
+  width:100%;max-width:1200px;margin:0 auto 3rem;
+  padding:0 .5rem;
+}
+.gallery-header{text-align:center;margin-bottom:2rem}
+.gallery-header h2{
+  font-family:'Dancing Script',cursive;
+  font-size:clamp(1.5rem,4vw,2.4rem);
+  color:var(--gold-light);margin-bottom:.3rem;
+}
+.gallery-header p{
+  font-size:clamp(.85rem,1.8vw,1rem);
+  color:var(--blush);opacity:.5;letter-spacing:.15em;
+}
+
+.masonry{
+  columns:3;
+  column-gap:12px;
+}
+.masonry-item{
+  break-inside:avoid;
+  margin-bottom:12px;
+  position:relative;
+  border-radius:14px;
+  overflow:hidden;
+  cursor:pointer;
+  box-shadow:0 8px 30px rgba(0,0,0,.4);
+  transition:transform .5s cubic-bezier(.23,1,.32,1),box-shadow .5s ease;
+  animation:itemReveal .8s ease-out both;
+}
+.masonry-item:nth-child(1){animation-delay:.1s}
+.masonry-item:nth-child(2){animation-delay:.2s}
+.masonry-item:nth-child(3){animation-delay:.3s}
+.masonry-item:nth-child(4){animation-delay:.4s}
+.masonry-item:nth-child(5){animation-delay:.5s}
+.masonry-item:nth-child(6){animation-delay:.6s}
+.masonry-item:nth-child(7){animation-delay:.7s}
+.masonry-item:nth-child(8){animation-delay:.8s}
+.masonry-item:nth-child(9){animation-delay:.9s}
+
+@keyframes itemReveal{
+  from{opacity:0;transform:translateY(40px) scale(.95)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+.masonry-item:hover{
+  transform:translateY(-8px) scale(1.02);
+  box-shadow:
+    0 0 0 2px var(--gold),
+    0 25px 60px rgba(0,0,0,.5),
+    0 0 80px rgba(196,70,110,.15);
+  z-index:10;
+}
+
+.masonry-item img,.masonry-item video{
+  width:100%;display:block;
+  transition:transform .6s cubic-bezier(.23,1,.32,1),filter .4s ease;
+  filter:brightness(.92) contrast(1.05) saturate(1.1);
+}
+.masonry-item:hover img,.masonry-item:hover video{
+  transform:scale(1.06);
+  filter:brightness(1) contrast(1.08) saturate(1.15);
+}
+
+/* Overlay gradient */
+.masonry-item::before{
+  content:'';position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,
+    rgba(26,10,16,.1) 0%,
+    transparent 30%,
+    transparent 65%,
+    rgba(26,10,16,.35) 100%);
+  pointer-events:none;transition:opacity .4s;
+}
+.masonry-item:hover::before{opacity:.4}
+
+/* Gold border on hover */
+.masonry-item::after{
+  content:'';position:absolute;inset:0;z-index:2;
+  border-radius:14px;
+  border:2px solid transparent;
+  transition:border-color .4s ease, box-shadow .4s ease;
+  pointer-events:none;
+}
+.masonry-item:hover::after{
+  border-color:rgba(212,168,83,.5);
+  box-shadow:inset 0 0 30px rgba(212,168,83,.08);
+}
+
+/* Video badge */
+.vid-badge{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;
+  width:56px;height:56px;border-radius:50%;
+  background:rgba(26,10,16,.55);backdrop-filter:blur(12px);
+  border:2px solid rgba(212,168,83,.5);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .3s ease,background .3s ease,border-color .3s ease;
+  pointer-events:none;
+}
+.vid-badge::after{
+  content:'';display:block;
+  width:0;height:0;
+  border-left:18px solid var(--gold-light);
+  border-top:11px solid transparent;
+  border-bottom:11px solid transparent;
+  margin-left:4px;
+}
+.masonry-item:hover .vid-badge{
+  transform:translate(-50%,-50%) scale(1.15);
+  background:rgba(155,27,48,.7);
+  border-color:var(--gold-light);
+}
+
+/* ── LIGHTBOX ── */
+.lightbox{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(8,3,5,.94);backdrop-filter:blur(24px);
+  display:none;align-items:center;justify-content:center;
+  cursor:pointer;
+}
+.lightbox.active{display:flex}
+.lightbox-inner{
+  position:relative;
+  max-width:92vw;max-height:90vh;
+  animation:lbIn .35s ease-out;
+}
+@keyframes lbIn{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+.lightbox-inner img,.lightbox-inner video{
+  max-width:92vw;max-height:88vh;display:block;
+  border-radius:12px;
+  box-shadow:0 0 0 2px var(--gold),0 40px 100px rgba(0,0,0,.7),0 0 120px rgba(196,70,110,.15);
+}
+.lb-btn{
+  position:absolute;z-index:1001;
+  background:rgba(26,10,16,.5);backdrop-filter:blur(10px);
+  border:1px solid rgba(212,168,83,.3);color:var(--cream);
+  cursor:pointer;transition:all .3s;font-family:inherit;
+}
+.lb-btn:hover{background:rgba(155,27,48,.6);border-color:var(--gold)}
+.lb-close{
+  top:16px;right:16px;position:fixed;
+  width:44px;height:44px;border-radius:50%;
+  font-size:1.6rem;display:flex;align-items:center;justify-content:center;
+}
+.lb-prev,.lb-next{
+  top:50%;width:48px;height:48px;border-radius:50%;
+  font-size:1.8rem;display:flex;align-items:center;justify-content:center;
+  position:fixed;
+}
+.lb-prev{left:16px;transform:translateY(-50%)}
+.lb-next{right:16px;transform:translateY(-50%)}
+.lb-counter{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  font-family:'Cormorant Garamond',serif;
+  font-size:1rem;color:var(--blush);opacity:.6;
+  letter-spacing:.2em;z-index:1001;
+}
+
+/* ── QUOTE ── */
+.quote-section{
+  text-align:center;max-width:620px;margin:0 auto 2rem;
+}
+.quote{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:clamp(1rem,2.5vw,1.35rem);
+  line-height:1.7;color:var(--petal);opacity:.7;
+  position:relative;padding:0 2.5rem;
+}
+.quote::before,.quote::after{
+  font-family:'Playfair Display',serif;font-size:2.5rem;
+  color:var(--gold);opacity:.35;position:absolute;
+}
+.quote::before{content:'\201C';top:-.5rem;left:0}
+.quote::after{content:'\201D';bottom:-1.5rem;right:0}
+.quote-pl{margin-bottom:.6rem}
+.quote-en{font-size:clamp(.85rem,2vw,1.1rem);opacity:.45}
+
+/* ── DATE INFO ── */
+.date-info{text-align:center;margin-bottom:2rem}
+.date-info .target-date{
+  font-family:'Dancing Script',cursive;
+  font-size:clamp(1.2rem,3vw,1.8rem);
+  color:var(--gold-light);margin-bottom:.2rem;
+}
+.date-info .target-detail{
+  font-size:.85rem;color:var(--blush);opacity:.45;letter-spacing:.12em;
+}
+
+/* ── CELEBRATION ── */
+.celebration{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;min-height:60vh;
+  animation:celebrationIn 1s ease-out both;
+}
+@keyframes celebrationIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+.celebration h2{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.5rem,7vw,5rem);color:var(--gold-light);
+  margin-bottom:1rem;text-shadow:0 0 60px rgba(212,168,83,.4);
+}
+.celebration .cel-sub{font-family:'Dancing Script',cursive;font-size:clamp(1.5rem,4vw,2.5rem);color:var(--rose)}
+.celebration .cel-hearts{font-size:4rem;margin-top:1.5rem;animation:pulse 1s ease-in-out infinite}
+
+.confetti-container{position:fixed;inset:0;z-index:100;pointer-events:none;overflow:hidden;display:none}
+.confetti-piece{position:absolute;top:-20px;opacity:.9;animation:confettiFall linear forwards}
+@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(1080deg);opacity:0}}
+
+/* ── REVEAL ── */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .masonry{columns:2;column-gap:10px}
+  .masonry-item{margin-bottom:10px}
+}
+@media(max-width:500px){
+  .masonry{columns:2;column-gap:8px}
+  .masonry-item{margin-bottom:8px;border-radius:10px}
+  .masonry-item::after{border-radius:10px}
+  .countdown-unit{min-width:60px;padding:.8rem .6rem .6rem}
+  .lb-prev,.lb-next{width:38px;height:38px;font-size:1.4rem}
+  .vid-badge{width:44px;height:44px}
+  .vid-badge::after{border-left-width:14px;border-top-width:8px;border-bottom-width:8px;margin-left:3px}
+}
+@media(max-width:380px){
+  .countdown-separator{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="hearts-container" id="heartsContainer"></div>
+<div class="confetti-container" id="confettiContainer"></div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lb-btn lb-close" id="lbClose">&times;</button>
+  <button class="lb-btn lb-prev" id="lbPrev">&#8249;</button>
+  <button class="lb-btn lb-next" id="lbNext">&#8250;</button>
+  <div class="lightbox-inner" id="lbInner"></div>
+  <div class="lb-counter" id="lbCounter"></div>
+</div>
+
+<main class="main">
+  <header class="header">
+    <h1>
+      Odliczanie do Naszego Spotkania
+      <span class="heart-icon">&hearts;</span>
+    </h1>
+    <p class="subtitle">Counting down until we meet again</p>
+  </header>
+
+  <!-- COUNTDOWN -->
+  <section class="countdown-section" id="countdownSection">
+    <p class="countdown-label">Do spotkania pozostalo / Time remaining</p>
+    <div class="countdown-grid">
+      <div class="countdown-unit">
+        <span class="countdown-value" id="days">00</span>
+        <span class="countdown-label-text">Dni / Days</span>
+      </div>
+      <span class="countdown-separator">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-value" id="hours">00</span>
+        <span class="countdown-label-text">Godz / Hours</span>
+      </div>
+      <span class="countdown-separator">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-value" id="minutes">00</span>
+        <span class="countdown-label-text">Min / Min</span>
+      </div>
+      <span class="countdown-separator">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-value" id="seconds">00</span>
+        <span class="countdown-label-text">Sek / Sec</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="gallery-section reveal" id="gallerySection">
+    <div class="gallery-header">
+      <h2>Nasze wspomnienia &hearts;</h2>
+      <p>Our memories together</p>
+    </div>
+    <div class="masonry" id="masonry">
+      <!-- Photos shuffled: mix of portrait/landscape for visual interest -->
+      <div class="masonry-item" data-type="image" data-src="IMG_6887.jpg">
+        <img src="IMG_6887.jpg" alt="Razem">
+      </div>
+      <div class="masonry-item" data-type="image" data-src="photo1.jpg">
+        <img src="photo1.jpg" alt="Razem">
+      </div>
+      <div class="masonry-item" data-type="image" data-src="9c6ebe3e-3812-42ce-bd23-ed3e5aae7b24.JPG">
+        <img src="9c6ebe3e-3812-42ce-bd23-ed3e5aae7b24.JPG" alt="Razem w miescie">
+      </div>
+      <div class="masonry-item" data-type="video" data-src="video.mp4">
+        <div class="vid-badge"></div>
+        <video src="video.mp4" muted loop playsinline preload="metadata"></video>
+      </div>
+      <div class="masonry-item" data-type="image" data-src="IMG_7095.jpg">
+        <img src="IMG_7095.jpg" alt="Razem">
+      </div>
+      <div class="masonry-item" data-type="image" data-src="IMG_7002.jpg">
+        <img src="IMG_7002.jpg" alt="Razem">
+      </div>
+      <div class="masonry-item" data-type="image" data-src="photo2.jpg">
+        <img src="photo2.jpg" alt="Razem">
+      </div>
+      <div class="masonry-item" data-type="image" data-src="IMG_6884.jpg">
+        <img src="IMG_6884.jpg" alt="Razem">
+      </div>
+      <div class="masonry-item" data-type="image" data-src="93368a0e-8d1c-4efc-84d3-f83bc4f47cea.JPG">
+        <img src="93368a0e-8d1c-4efc-84d3-f83bc4f47cea.JPG" alt="Razem">
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section class="quote-section reveal">
+    <p class="quote quote-pl">
+      Kazda sekunda bez Ciebie to sekunda za dluga,
+      ale kazda sekunda blizej Ciebie to dar.
+    </p>
+    <p class="quote quote-en">
+      Every second without you is a second too long,
+      but every second closer to you is a gift.
+    </p>
+  </section>
+
+  <div class="date-info reveal">
+    <p class="target-date">Sroda, 11 lutego &mdash; 10:00</p>
+    <p class="target-detail">Wednesday, February 11th &mdash; 10:00 AM</p>
+  </div>
+
+  <section class="celebration" id="celebration">
+    <h2>Czas na milosc!</h2>
+    <p class="cel-sub">Time for love!</p>
+    <div class="cel-hearts">&hearts;&hearts;&hearts;</div>
+  </section>
+</main>
+
+<script>
+// ── TARGET DATE ──
+const TARGET = new Date(2026, 1, 11, 10, 0, 0); // Feb 11, 2026 10:00 AM
+
+// ── COUNTDOWN ──
+const daysEl=document.getElementById('days'),hoursEl=document.getElementById('hours'),
+      minutesEl=document.getElementById('minutes'),secondsEl=document.getElementById('seconds'),
+      countdownSection=document.getElementById('countdownSection'),
+      celebrationEl=document.getElementById('celebration');
+
+function pad(n){return String(n).padStart(2,'0')}
+function animateTick(el,v){
+  const p=pad(v);
+  if(el.textContent!==p){el.textContent=p;el.classList.remove('tick');void el.offsetWidth;el.classList.add('tick')}
+}
+function updateCountdown(){
+  const diff=TARGET-new Date();
+  if(diff<=0){
+    countdownSection.style.display='none';
+    document.querySelector('.quote-section').style.display='none';
+    document.querySelector('.date-info').style.display='none';
+    celebrationEl.style.display='flex';
+    launchConfetti();return;
+  }
+  animateTick(daysEl,Math.floor(diff/864e5));
+  animateTick(hoursEl,Math.floor((diff%864e5)/36e5));
+  animateTick(minutesEl,Math.floor((diff%36e5)/6e4));
+  animateTick(secondsEl,Math.floor((diff%6e4)/1e3));
+}
+updateCountdown();setInterval(updateCountdown,1000);
+
+// ── FLOATING HEARTS ──
+const heartChars=['\u2665','\u2764','\u2661','\uD83D\uDC95','\uD83D\uDC96','\uD83D\uDC97','\uD83D\uDC98'];
+const hCont=document.getElementById('heartsContainer');
+function spawnHeart(){
+  const h=document.createElement('span');h.className='floating-heart';
+  h.textContent=heartChars[Math.floor(Math.random()*heartChars.length)];
+  h.style.left=Math.random()*100+'%';
+  h.style.fontSize=(Math.random()*1.4+.5)+'rem';
+  h.style.animationDuration=(Math.random()*12+8)+'s';
+  h.style.animationDelay=(Math.random()*3)+'s';
+  h.style.color=`hsl(${(Math.random()*40+330)%360},70%,${55+Math.random()*15}%)`;
+  hCont.appendChild(h);setTimeout(()=>h.remove(),22000);
+}
+for(let i=0;i<10;i++)setTimeout(()=>spawnHeart(),i*700);
+setInterval(spawnHeart,2200);
+
+// ── VIDEO HOVER ──
+document.querySelectorAll('.masonry-item[data-type="video"]').forEach(item=>{
+  const vid=item.querySelector('video');
+  item.addEventListener('mouseenter',()=>{vid.currentTime=0;vid.play().catch(()=>{})});
+  item.addEventListener('mouseleave',()=>vid.pause());
+});
+
+// ── LIGHTBOX ──
+const lightbox=document.getElementById('lightbox');
+const lbInner=document.getElementById('lbInner');
+const lbCounter=document.getElementById('lbCounter');
+const allItems=[...document.querySelectorAll('.masonry-item')];
+let curIdx=0;
+
+function openLB(idx){
+  curIdx=idx;renderLB();
+  lightbox.classList.add('active');
+  document.body.style.overflow='hidden';
+}
+function closeLB(){
+  lightbox.classList.remove('active');
+  document.body.style.overflow='';
+  const v=lbInner.querySelector('video');if(v)v.pause();
+}
+function renderLB(){
+  const it=allItems[curIdx];
+  const v=lbInner.querySelector('video');if(v)v.pause();
+  if(it.dataset.type==='video'){
+    lbInner.innerHTML=`<video src="${it.dataset.src}" controls autoplay loop playsinline></video>`;
+  }else{
+    lbInner.innerHTML=`<img src="${it.dataset.src}" alt="">`;
+  }
+  lbCounter.textContent=`${curIdx+1} / ${allItems.length}`;
+}
+
+allItems.forEach((item,i)=>item.addEventListener('click',()=>openLB(i)));
+document.getElementById('lbClose').addEventListener('click',e=>{e.stopPropagation();closeLB()});
+lightbox.addEventListener('click',e=>{if(e.target===lightbox)closeLB()});
+document.getElementById('lbPrev').addEventListener('click',e=>{
+  e.stopPropagation();curIdx=(curIdx-1+allItems.length)%allItems.length;renderLB();
+});
+document.getElementById('lbNext').addEventListener('click',e=>{
+  e.stopPropagation();curIdx=(curIdx+1)%allItems.length;renderLB();
+});
+document.addEventListener('keydown',e=>{
+  if(!lightbox.classList.contains('active'))return;
+  if(e.key==='Escape')closeLB();
+  if(e.key==='ArrowLeft'){curIdx=(curIdx-1+allItems.length)%allItems.length;renderLB()}
+  if(e.key==='ArrowRight'){curIdx=(curIdx+1)%allItems.length;renderLB()}
+});
+
+// ── SCROLL REVEAL ──
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// ── CONFETTI ──
+function launchConfetti(){
+  const cc=document.getElementById('confettiContainer');cc.style.display='block';
+  const colors=['#9b1b30','#c4466e','#d4a853','#f0d48a','#e8a0b4','#ff6b8a','#ffb3c6'];
+  const shapes=['\u2665','*','\u25CF','\u2726'];
+  function burst(){
+    for(let i=0;i<60;i++){
+      const p=document.createElement('span');p.className='confetti-piece';
+      p.textContent=shapes[Math.floor(Math.random()*shapes.length)];
+      p.style.left=Math.random()*100+'%';
+      p.style.color=colors[Math.floor(Math.random()*colors.length)];
+      p.style.fontSize=(Math.random()*16+8)+'px';
+      p.style.animationDuration=(Math.random()*3+2)+'s';
+      p.style.animationDelay=(Math.random()*1.5)+'s';
+      cc.appendChild(p);setTimeout(()=>p.remove(),6000);
+    }
+  }
+  burst();setTimeout(burst,1500);setTimeout(burst,3000);setInterval(burst,5000);
+}
+</script>
+</body>
+</html>
